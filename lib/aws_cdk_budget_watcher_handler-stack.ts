@@ -17,9 +17,71 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
 
     cdk.Tags.of(this).add('AwsCdkBudgetWatcherHandlerStack', '')
 
-    const topic = new sns.Topic(this, 'BudgetWatcher', {
+
+    const cognitoGroupNameCfnParam = new cdk.CfnParameter(this, "CognitoGroupNameToChange", {
+      type: "String",
+      default: cdk.Aws.NO_VALUE, 
+      description: "Cognito group name that we want to change when overbudget"});
+
+    const cognitoPoolIdCfnParam = new cdk.CfnParameter(this, "CognitoPoolId", {
+        type: "String",
+        default: cdk.Aws.NO_VALUE, 
+        description: "Cognito Pool Id"});  
+
+    const identityPoolArnCfnParam = new cdk.CfnParameter(this, "IdentityPoolIdArn", {
+      type: "String",
+      default: cdk.Aws.NO_VALUE, 
+      description: "Identity Pool Id"});  
+
+      
+    const overbudgetTopic = new sns.Topic(this, 'BudgetWatcher', {
       displayName: 'Budget Wacther Alert',
     });
+    const overbudgetTopicPolicy = new sns.TopicPolicy(this, 'TopicPolicy', {
+      topics: [overbudgetTopic],
+    });
+    overbudgetTopicPolicy.document.addStatements(new iam.PolicyStatement({
+      actions: ["sns:Subscribe"],
+      principals: [new iam.AnyPrincipal()],
+      resources: [overbudgetTopic.topicArn],
+    }));
 
+    const cfnBudget = new budgets.CfnBudget(this, "MyBuget", {
+      budget: {
+        budgetType: 'COST',
+        timeUnit: 'DAILY',
+        budgetLimit: {
+          amount: 2,
+          unit: 'USD',
+        },
+        budgetName: 'MyBuget',
+      },
+      notificationsWithSubscribers: [
+        {
+          notification: {
+            notificationType: 'ACTUAL',
+            comparisonOperator: 'GREATER_THAN',
+            threshold: 75, 
+            thresholdType: 'PERCENTAGE'
+          },
+          subscribers: [
+            {
+              subscriptionType: 'SNS',
+              address: overbudgetTopic.topicArn
+            },
+            ]
+        }
+
+      ]
+    })
+
+
+    //need to install esbuild https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html
+    //  otherwise, cdk will try to package the lambda function into docker container 
+    const overbudgetListenerLambda = new nodejs.NodejsFunction(this, 'overbudget_listener_lambda', 
+      { runtime: lambda.Runtime.NODEJS_18_X });
+
+    
+    overbudgetTopic.addSubscription(new subscriptions.LambdaSubscription(overbudgetListenerLambda, {}));
   }
 }
