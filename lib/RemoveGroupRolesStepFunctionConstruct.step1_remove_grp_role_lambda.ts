@@ -20,8 +20,14 @@ import { CognitoIdentityProviderClient, AddCustomAttributesCommand, AdminAddUser
 
 export const handler = async (event: any, context: Context): Promise<any> => {
 
+    if (!process.env.cognitoPoolId || !process.env.roleToDowngradeToArn) {
+        console.log('nothing to do, empty cognito pool arguments');
+        return;
+    }
+
+
     const identityProviderclient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION });
 
-    
+
 
 }
