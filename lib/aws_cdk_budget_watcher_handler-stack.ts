@@ -21,17 +21,17 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
 
     const nameOfCognitoGroupToDowngradeCfnParam = new cdk.CfnParameter(this, "NameOfCognitoGroupToDowngrade", {
       type: "String",
-      default: cdk.Aws.NO_VALUE,
+      default: "",
       description: "The name of Cognito group that we want to downgrade its role when overbudget"});
 
     const cognitoUserPoolIdCfnParam = new cdk.CfnParameter(this, "CognitoUserPoolId", {
         type: "String",
-        default: cdk.Aws.NO_VALUE,
+        default: "",
         description: "Cognito User Pool Id"});  
 
     const identityPoolIdCfnParam = new cdk.CfnParameter(this, "IdentityPoolId", {
       type: "String",
-      default: cdk.Aws.NO_VALUE,
+      default: "",
       description: "Identity Pool Id"});  
 
       
