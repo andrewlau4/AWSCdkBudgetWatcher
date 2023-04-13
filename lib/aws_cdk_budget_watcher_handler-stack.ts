@@ -9,6 +9,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as nodejs  from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { RemoveGroupRolesStepFunction } from './RemoveGroupRolesStepFunctionConstruct';
 
 
 export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
@@ -18,17 +19,17 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
     cdk.Tags.of(this).add('AwsCdkBudgetWatcherHandlerStack', '')
 
 
-    const cognitoGroupNameCfnParam = new cdk.CfnParameter(this, "CognitoGroupNameToChange", {
+    const nameOfCognitoGroupToDowngradeCfnParam = new cdk.CfnParameter(this, "NameOfCognitoGroupToDowngrade", {
       type: "String",
       default: cdk.Aws.NO_VALUE, 
-      description: "Cognito group name that we want to change when overbudget"});
+      description: "The name of Cognito group that we want to downgrade its role when overbudget"});
 
     const cognitoPoolIdCfnParam = new cdk.CfnParameter(this, "CognitoPoolId", {
         type: "String",
         default: cdk.Aws.NO_VALUE, 
         description: "Cognito Pool Id"});  
 
-    const identityPoolArnCfnParam = new cdk.CfnParameter(this, "IdentityPoolIdArn", {
+    const identityPoolIdCfnParam = new cdk.CfnParameter(this, "IdentityPoolId", {
       type: "String",
       default: cdk.Aws.NO_VALUE, 
       description: "Identity Pool Id"});  
@@ -81,7 +82,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       assumedBy: new iam.FederatedPrincipal("cognito-identity.amazonaws.com",
       {
         "StringEquals": {
-          "cognito-identity.amazonaws.com:aud": "us-east-1:125d0b0d-878e-433d-a287-972bbac09fa4"
+          "cognito-identity.amazonaws.com:aud": identityPoolIdCfnParam.valueAsString
         },
         "ForAnyValue:StringLike": {
           "cognito-identity.amazonaws.com:amr": "authenticated"
@@ -97,7 +98,12 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       }
     ));
 
-
+    new RemoveGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
+      nameOfCognitoGroupToDowngrade: nameOfCognitoGroupToDowngradeCfnParam.valueAsString,
+      identityPoolId: identityPoolIdCfnParam.valueAsString,
+      roleToDowngradeTo: dummyRole,
+      
+    });
 
   }
 }
