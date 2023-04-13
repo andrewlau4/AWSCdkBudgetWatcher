@@ -24,10 +24,10 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       default: cdk.Aws.NO_VALUE, 
       description: "The name of Cognito group that we want to downgrade its role when overbudget"});
 
-    const cognitoPoolIdCfnParam = new cdk.CfnParameter(this, "CognitoPoolId", {
+    const cognitoUserPoolIdCfnParam = new cdk.CfnParameter(this, "CognitoUserPoolId", {
         type: "String",
         default: cdk.Aws.NO_VALUE, 
-        description: "Cognito Pool Id"});  
+        description: "Cognito User Pool Id"});  
 
     const identityPoolIdCfnParam = new cdk.CfnParameter(this, "IdentityPoolId", {
       type: "String",
@@ -100,9 +100,9 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
 
     new RemoveGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
       nameOfCognitoGroupToDowngrade: nameOfCognitoGroupToDowngradeCfnParam.valueAsString,
-      identityPoolId: identityPoolIdCfnParam.valueAsString,
+      cognitoUserPoolId: cognitoUserPoolIdCfnParam.valueAsString,
       roleToDowngradeTo: dummyRole,
-      
+
     });
 
   }

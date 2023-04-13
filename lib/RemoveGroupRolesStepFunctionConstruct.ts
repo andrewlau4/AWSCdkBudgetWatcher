@@ -9,7 +9,7 @@ import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 
 export interface DowngradeGroupRolesStepFunctionProp {
     nameOfCognitoGroupToDowngrade: string;
-    cognitoPoolId: string;
+    cognitoUserPoolId: string;
     roleToDowngradeTo: iam.IRole;
 };
 
@@ -23,7 +23,7 @@ export class RemoveGroupRolesStepFunction extends Construct {
             runtime: lambda.Runtime.NODEJS_18_X,
             environment: {
                 nameOfCognitoGroupToDowngrade: props.nameOfCognitoGroupToDowngrade,
-                cognitoPoolId: props.cognitoPoolId,
+                cognitoPoolId: props.cognitoUserPoolId,
                 roleToDowngradeToArn: props.roleToDowngradeTo.roleArn
             }
         });
@@ -43,7 +43,7 @@ export class RemoveGroupRolesStepFunction extends Construct {
           );
 
         const cognitoPool = cognito.UserPool.fromUserPoolId(this, "myCognitoUserPool", 
-            props.cognitoPoolId);
+            props.cognitoUserPoolId);
 
         cognitoPool.grant(step1Function,
             "cognito-idp:ListGroups",
