@@ -37,16 +37,8 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
     const overbudgetTopic = new sns.Topic(this, 'BudgetWatcher', {
       displayName: 'Budget Wacther Alert',
     });
-    const overbudgetTopicPolicy = new sns.TopicPolicy(this, 'TopicPolicy', {
-      topics: [overbudgetTopic],
-    });
-    overbudgetTopicPolicy.document.addStatements(new iam.PolicyStatement({
-      actions: ["sns:Subscribe"],
-      principals: [new iam.AnyPrincipal()],
-      resources: [overbudgetTopic.topicArn],
-    }));
 
-    const cfnBudget = new budgets.CfnBudget(this, "MyBuget", {
+    const cfnBudget = new budgets.CfnBudget(this, "Buget", {
       budget: {
         budgetType: 'COST',
         timeUnit: 'DAILY',
@@ -83,5 +75,29 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
 
     
     overbudgetTopic.addSubscription(new subscriptions.LambdaSubscription(overbudgetListenerLambda, {}));
+  
+    //this is the role i want to downgrade to
+    const dummyRole = new iam.Role(this, "DummyRole", {
+      assumedBy: new iam.FederatedPrincipal("cognito-identity.amazonaws.com",
+      {
+        "StringEquals": {
+          "cognito-identity.amazonaws.com:aud": "us-east-1:125d0b0d-878e-433d-a287-972bbac09fa4"
+        },
+        "ForAnyValue:StringLike": {
+          "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+      },
+      "sts:AssumeRoleWithWebIdentity") 
+    });
+    //this is the permission i want to downgrade the cognito users to if i am over budget
+    dummyRole.addToPolicy(
+      new iam.PolicyStatement({
+        resources: ['*'],
+        actions: ['cloudwatch:ListMetricStreams'],
+      }
+    ));
+
+
+
   }
 }
