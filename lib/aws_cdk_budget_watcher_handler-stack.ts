@@ -11,6 +11,7 @@ import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { RemoveGroupRolesStepFunction } from './RemoveGroupRolesStepFunctionConstruct';
 
+export const STATE_MACHINE_ARN = "STATE_MACHINE_ARN";
 
 export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -98,12 +99,20 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       }
     ));
 
-    new RemoveGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
+    const stepFunction = new RemoveGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
       nameOfCognitoGroupToDowngrade: nameOfCognitoGroupToDowngradeCfnParam.valueAsString,
       cognitoUserPoolId: cognitoUserPoolIdCfnParam.valueAsString,
       roleToDowngradeTo: dummyRole,
 
     });
+
+    stepFunction.stepFuncStateMachine.grant(
+      overbudgetListenerLambda,
+      "states:StartExecution"
+    )
+
+    overbudgetListenerLambda.addEnvironment(STATE_MACHINE_ARN, 
+      stepFunction.stepFuncStateMachine.role.roleArn);
 
   }
 }
