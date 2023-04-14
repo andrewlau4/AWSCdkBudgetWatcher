@@ -9,7 +9,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as nodejs  from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { RemoveGroupRolesStepFunction } from './RemoveGroupRolesStepFunctionConstruct';
+import { DowngradeGroupRolesStepFunction } from './DowngradeGroupRolesStepFunctionConstruct';
 
 export const STATE_MACHINE_ARN = "STATE_MACHINE_ARN";
 
@@ -99,7 +99,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       }
     ));
 
-    const stepFunction = new RemoveGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
+    const stepFunction = new DowngradeGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
       nameOfCognitoGroupToDowngrade: nameOfCognitoGroupToDowngradeCfnParam.valueAsString,
       cognitoUserPoolId: cognitoUserPoolIdCfnParam.valueAsString,
       roleToDowngradeTo: dummyRole,

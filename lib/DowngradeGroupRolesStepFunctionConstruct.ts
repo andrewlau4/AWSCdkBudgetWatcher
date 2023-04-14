@@ -20,7 +20,7 @@ export enum StepFunctionLambdaStepsEnv {
   ROLE_TO_DOWNGRADE_TO_ARN = "roleToDowngradeToArn"
 }
 
-export class RemoveGroupRolesStepFunction extends Construct {
+export class DowngradeGroupRolesStepFunction extends Construct {
 
     public readonly stepFuncStateMachine: stepfunctions.StateMachine;
 
