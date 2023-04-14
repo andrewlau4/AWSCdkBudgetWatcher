@@ -63,7 +63,7 @@ export class RemoveGroupRolesStepFunction extends Construct {
 
         const stepFunctions = new stepfunctionstasks.LambdaInvoke(this, "Downgrade Role Of Group", {
           lambdaFunction: step1Function, 
-          resultPath: '$step1Result'
+          resultPath: '$.step1Result'
         })
 
         this.stepFuncStateMachine = new stepfunctions.StateMachine(this, 'BudgetWatcherStateMachine', {
