@@ -1,9 +1,11 @@
 import { SNSEvent, Context } from 'aws-lambda';
 import { SFNClient, StartExecutionCommand, StartExecutionCommandInput } from "@aws-sdk/client-sfn";
 
-import { STATE_MACHINE_ARN_KEY } from './aws_cdk_budget_watcher_handler-stack';
+import { STATE_MACHINE_ARN_KEY } from './Constants';
 
 export const handler = async (event: SNSEvent, context: Context): Promise<void> => {
+
+    console.log("overbudget listener is called");
 
     const sfnClient = new SFNClient({ region: process.env.AWS_REGION });
 
@@ -16,6 +18,7 @@ export const handler = async (event: SNSEvent, context: Context): Promise<void> 
 
     const command = new StartExecutionCommand(params);
 
+    console.log("overbudget listener going to execute command");
     const sfnResponse = await sfnClient.send(command)
 
     console.log(`Over Budget Listener execute result ${JSON.stringify(sfnResponse, null, 2)}`)

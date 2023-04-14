@@ -7,18 +7,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-
-export interface DowngradeGroupRolesStepFunctionProp {
-    nameOfCognitoGroupToDowngrade: string;
-    cognitoUserPoolId: string;
-    roleToDowngradeTo: iam.IRole;
-};
-
-export enum StepFunctionLambdaStepsEnv {
-  NAME_OF_COGNITO_GROUP_TO_DOWNGRADE = "nameOfCognitoGroupToDowngrade",
-  COGNITO_POOL_ID = "cognitoPoolId",
-  ROLE_TO_DOWNGRADE_TO_ARN = "roleToDowngradeToArn"
-}
+import { StepFunctionLambdaStepsEnv, DowngradeGroupRolesStepFunctionProp } from './Constants';
 
 export class DowngradeGroupRolesStepFunction extends Construct {
 
@@ -28,7 +17,7 @@ export class DowngradeGroupRolesStepFunction extends Construct {
         super(scope, id);
 
 
-        const step1Function = new nodejs.NodejsFunction(this, 'step1_remove_grp_role_lambda', {
+        const step1Function = new nodejs.NodejsFunction(this, 'step1_downgrade_grp_role_lambda', {
             runtime: lambda.Runtime.NODEJS_18_X,
             environment: {
               [StepFunctionLambdaStepsEnv.NAME_OF_COGNITO_GROUP_TO_DOWNGRADE]: props.nameOfCognitoGroupToDowngrade,
@@ -38,7 +27,7 @@ export class DowngradeGroupRolesStepFunction extends Construct {
         });
 
         step1Function.role?.attachInlinePolicy(
-            new iam.Policy(this, 'removegrp-userpool-iam-policy', {
+            new iam.Policy(this, 'downgradegrp-userpool-iam-policy', {
               statements: [new iam.PolicyStatement({
                 actions: [
                   "iam:GetRole",

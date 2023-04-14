@@ -18,7 +18,7 @@ import { CognitoIdentityProviderClient, AddCustomAttributesCommand, AdminAddUser
         ProviderDescription, UpdateGroupCommand, UpdateGroupCommandInput, UpdateGroupCommandOutput 
     } from "@aws-sdk/client-cognito-identity-provider";
 
-import { StepFunctionLambdaStepsEnv } from './DowngradeGroupRolesStepFunctionConstruct';
+import { StepFunctionLambdaStepsEnv } from './Constants';
 
 export type DowngradeGroupResult = {
     [k: string]: {
@@ -60,7 +60,7 @@ export const handler = async (event: any, context: Context): Promise<any> => {
                         && value.RoleArn != process.env[StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN]
                         ) {
 
-                            const updateGrpInput: UpdateGroupCommandInput = { 
+                        const updateGrpInput: UpdateGroupCommandInput = { 
                                 GroupName: value.GroupName,
                                 UserPoolId: userPoolId,
                                 Description: value.Description,
@@ -84,7 +84,7 @@ export const handler = async (event: any, context: Context): Promise<any> => {
         removeRoleFromGrpResult.forEach(
             (value: UpdateGroupCommandOutput) => {
                 result[value.Group!.GroupName!].afterGroupArn = value.Group!.RoleArn!;
-                
+
                 console.log(`removed result: group ${value.Group!.GroupName} 
                     rolearn ${value.Group!.RoleArn}`);
             }

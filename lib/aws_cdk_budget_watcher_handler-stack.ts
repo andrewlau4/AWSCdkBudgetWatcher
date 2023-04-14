@@ -10,8 +10,7 @@ import * as nodejs  from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { DowngradeGroupRolesStepFunction } from './DowngradeGroupRolesStepFunctionConstruct';
-
-export const STATE_MACHINE_ARN_KEY = "STATE_MACHINE_ARN";
+import { STATE_MACHINE_ARN_KEY } from './Constants';
 
 export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
