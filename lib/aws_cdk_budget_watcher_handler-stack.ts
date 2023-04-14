@@ -11,7 +11,7 @@ import * as stepfunctions from 'aws-cdk-lib/aws-stepfunctions';
 import * as stepfunctionstasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { DowngradeGroupRolesStepFunction } from './DowngradeGroupRolesStepFunctionConstruct';
 
-export const STATE_MACHINE_ARN = "STATE_MACHINE_ARN";
+export const STATE_MACHINE_ARN_KEY = "STATE_MACHINE_ARN";
 
 export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -106,12 +106,9 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
 
     });
 
-    stepFunction.stepFuncStateMachine.grant(
-      overbudgetListenerLambda,
-      "states:StartExecution"
-    )
+    stepFunction.stepFuncStateMachine.grant(overbudgetListenerLambda, "states:StartExecution");
 
-    overbudgetListenerLambda.addEnvironment(STATE_MACHINE_ARN, 
+    overbudgetListenerLambda.addEnvironment(STATE_MACHINE_ARN_KEY, 
       stepFunction.stepFuncStateMachine.role.roleArn);
 
   }
