@@ -75,13 +75,22 @@ export class DowngradeGroupRolesStepFunction extends Construct {
             "cognito-idp:UpdateGroup"
             );
 
-        cognitoPool.grant(step2Function,
-          "cognito-identity:SetIdentityPoolRoles",
-          "cognito-identity:ListIdentityPools",
-          "cognito-identity:ListIdentities",
-          "cognito-identity:UpdateIdentityPool",
-          "cognito-identity:GetIdentityPoolRoles",
-          );
+        step2Function.role?.attachInlinePolicy(
+          new iam.Policy(this, 'identitypool-policy', {
+            statements: [new iam.PolicyStatement({
+              actions: [
+              "cognito-identity:SetIdentityPoolRoles",
+              "cognito-identity:ListIdentityPools",
+              "cognito-identity:ListIdentities",
+              "cognito-identity:UpdateIdentityPool",
+              "cognito-identity:GetIdentityPoolRoles",
+              ],
+              resources: [
+                `arn:aws:cognito-identity:${process.env.CDK_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}:identitypool/${props.identityPoolId}`
+              ],
+            })],
+          })
+        );
 
 
         const stepFunctions = new stepfunctionstasks.LambdaInvoke(this, "Downgrade Role Of Group", {
