@@ -89,14 +89,15 @@ export class DowngradeGroupRolesStepFunction extends Construct {
           resultPath: '$.step1Result'
         })
 
-        stepFunctions.next(step2Function);
+        stepFunctions.next(new stepfunctionstasks.LambdaInvoke(this, "Downgrade Roles in Identity Pool", { 
+          lambdaFunction: step2Function,
+          resultPath: '$.step2Result'
+        }) );
 
         this.stepFuncStateMachine = new stepfunctions.StateMachine(this, 'BudgetWatcherStateMachine', {
           definition: stepFunctions,
           timeout: cdk.Duration.minutes(5)
         });
-
-
 
     }
 
