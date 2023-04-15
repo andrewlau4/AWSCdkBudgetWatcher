@@ -108,7 +108,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
     stepFunction.stepFuncStateMachine.grant(overbudgetListenerLambda, "states:StartExecution");
 
     overbudgetListenerLambda.addEnvironment(STATE_MACHINE_ARN_KEY, 
-      stepFunction.stepFuncStateMachine.role.roleArn);
+      stepFunction.stepFuncStateMachine.stateMachineArn);
 
   }
 }
