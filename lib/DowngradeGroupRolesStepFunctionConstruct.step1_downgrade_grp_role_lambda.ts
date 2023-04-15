@@ -31,8 +31,8 @@ export const handler = async (event: any, context: Context): Promise<any> => {
 
     const result: DowngradeGroupResult = {};
 
-    if (!process.env[StepFunctionLambdaStepsEnv.COGNITO_POOL_ID] 
-        || !process.env[StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN]) {
+    if (!process.env[StepFunctionLambdaStepsEnv.COGNITO_POOL_ID]?.trim() 
+        || !process.env[StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN]?.trim()) {
         console.log('nothing to do, empty cognito pool arguments');
         return result;
     }
@@ -52,13 +52,18 @@ export const handler = async (event: any, context: Context): Promise<any> => {
     const removeRoleFromGrpResultPromiseArray: Array<Promise<UpdateGroupCommandOutput>> = [];
 
     if (listGrpResponse.Groups?.length) {
+
+        const groupsToDowngrade = process.env[StepFunctionLambdaStepsEnv.NAME_OF_COGNITO_GROUP_TO_DOWNGRADE]
+                            ?.trim().toLocaleLowerCase().split(/\s*,\s*/);
+
         listGrpResponse.Groups?.forEach(
             (value: GroupType, index: number, array: GroupType[]) => {
                 if (value.GroupName) {
-                    if (process.env[StepFunctionLambdaStepsEnv.NAME_OF_COGNITO_GROUP_TO_DOWNGRADE]
-                        ?.toLocaleLowerCase().includes(value.GroupName!.toLocaleLowerCase().trim())
+                    if (groupsToDowngrade!.includes(value.GroupName!.toLocaleLowerCase().trim())
                         && value.RoleArn != process.env[StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN]
                         ) {
+
+                        console.log(`Going to downgrade: ${JSON.stringify(value)}`)
 
                         const updateGrpInput: UpdateGroupCommandInput = { 
                                 GroupName: value.GroupName,
@@ -71,7 +76,7 @@ export const handler = async (event: any, context: Context): Promise<any> => {
                         removeRoleFromGrpResultPromiseArray.push(
                             identityProviderclient.send(new UpdateGroupCommand(updateGrpInput))); 
                             
-                        result[value.GroupName!].originlGroupArn = value.RoleArn;
+                        result[value.GroupName!].originlGroupArn = value.RoleArn ?? '';
 
                     }
                 }
