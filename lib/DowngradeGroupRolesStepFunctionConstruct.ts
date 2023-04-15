@@ -46,7 +46,8 @@ export class DowngradeGroupRolesStepFunction extends Construct {
         cognitoPool.grant(step1Function,
             "cognito-idp:ListGroups",
             "cognito-idp:GetGroup",
-            "cognito-idp:ListUserPools"
+            "cognito-idp:ListUserPools",
+            "cognito-idp:UpdateGroup"
             );
 
 
