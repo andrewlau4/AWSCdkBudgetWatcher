@@ -3,18 +3,9 @@ import { Context } from 'aws-lambda';
 
 import { StepFunctionLambdaStepsEnv } from './Constants';
 
-
-import { CognitoIdentityClient, ListIdentitiesCommand, 
-    ListIdentitiesCommandInput, ListIdentitiesCommandOutput,
-
-    GetIdentityPoolRolesCommand,
-
-    GetIdentityPoolRolesCommandInput,
-    GetIdentityPoolRolesCommandOutput,
-
-    SetIdentityPoolRolesCommand,
-    SetIdentityPoolRolesCommandInput,
-    SetIdentityPoolRolesCommandOutput
+import { CognitoIdentityClient, ListIdentitiesCommand, ListIdentitiesCommandInput, ListIdentitiesCommandOutput,
+    GetIdentityPoolRolesCommand, GetIdentityPoolRolesCommandInput, GetIdentityPoolRolesCommandOutput, SetIdentityPoolRolesCommand,
+    SetIdentityPoolRolesCommandInput, SetIdentityPoolRolesCommandOutput
 } from "@aws-sdk/client-cognito-identity";
 
 
