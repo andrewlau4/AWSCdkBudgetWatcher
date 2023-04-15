@@ -23,7 +23,7 @@ import { StepFunctionLambdaStepsEnv } from './Constants';
 export type DowngradeGroupResult = {
     [k: string]: {
         originlGroupArn?: string;
-        afterGroupArn: string;
+        afterGroupArn?: string;
     }
 }
 
@@ -75,7 +75,10 @@ export const handler = async (event: any, context: Context): Promise<any> => {
 
                         removeRoleFromGrpResultPromiseArray.push(
                             identityProviderclient.send(new UpdateGroupCommand(updateGrpInput))); 
-                            
+                        
+                        if (!result[value.GroupName!]) {
+                            result[value.GroupName!] = {};
+                        }
                         result[value.GroupName!].originlGroupArn = value.RoleArn ?? '';
 
                     }
