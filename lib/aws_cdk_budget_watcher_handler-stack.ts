@@ -78,7 +78,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
     overbudgetTopic.addSubscription(new subscriptions.LambdaSubscription(overbudgetListenerLambda, {}));
   
     //this is the role i want to downgrade to
-    const dummyRole = new iam.Role(this, "DummyRole", {
+    const downgradeToRole = new iam.Role(this, "DowngradeToRole", {
       assumedBy: new iam.FederatedPrincipal("cognito-identity.amazonaws.com",
       {
         "StringEquals": {
@@ -91,18 +91,41 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       "sts:AssumeRoleWithWebIdentity") 
     });
     //this is the permission i want to downgrade the cognito users to if i am over budget
-    dummyRole.addToPolicy(
+    // set the Policy to something that you see fit
+    downgradeToRole.addToPolicy(
       new iam.PolicyStatement({
         resources: ['*'],
         actions: ['cloudwatch:ListMetricStreams'],
       }
     ));
 
+    const unauthRole = new iam.Role(this, "UnAuthRole", {
+      assumedBy: new iam.FederatedPrincipal("cognito-identity.amazonaws.com",
+      {
+        "StringEquals": {
+          "cognito-identity.amazonaws.com:aud": identityPoolIdCfnParam.valueAsString
+        },
+        "ForAnyValue:StringLike": {
+          "cognito-identity.amazonaws.com:amr": "unauthenticated"
+        }
+      },
+      "sts:AssumeRoleWithWebIdentity") 
+    });
+    //this is the permission i want to downgrade the cognito users to if i am over budget
+    // set the Policy to something that you see fit
+    // unauthRole.addToPolicy(
+    //   new iam.PolicyStatement({
+    //     resources: ['*'],
+    //     actions: ['cloudwatch:ListMetricStreams'],
+    //   }
+    // ));
+
     const stepFunction = new DowngradeGroupRolesStepFunction(this, 'RemoveGroupRolesStepFunction', {
       nameOfCognitoGroupToDowngrade: nameOfCognitoGroupToDowngradeCfnParam.valueAsString,
       cognitoUserPoolId: cognitoUserPoolIdCfnParam.valueAsString,
-      roleToDowngradeTo: dummyRole,
-
+      identityPoolId: identityPoolIdCfnParam.valueAsString,
+      roleToDowngradeTo: downgradeToRole,
+      roleForUnauthenticatedUser: unauthRole
     });
 
     stepFunction.stepFuncStateMachine.grant(overbudgetListenerLambda, "states:StartExecution");

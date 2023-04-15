@@ -40,6 +40,31 @@ export class DowngradeGroupRolesStepFunction extends Construct {
             })
           );
 
+        const step2Function = new nodejs.NodejsFunction(this, 'step2_downgrade_identity_user_role_lambda', {
+            runtime: lambda.Runtime.NODEJS_18_X,
+            environment: {
+              [StepFunctionLambdaStepsEnv.IDENTITY_POOL_ID]: props.identityPoolId,
+              [StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN]: props.roleToDowngradeTo.roleArn,
+              [StepFunctionLambdaStepsEnv.ROLE_FOR_UNAUTH_ARN]: props.roleForUnauthenticatedUser.roleArn
+            }
+        });
+
+        step2Function.role?.attachInlinePolicy(
+            new iam.Policy(this, 'downgrade-identitypool-iam-policy', {
+              statements: [new iam.PolicyStatement({
+                actions: [
+                  "iam:GetRole",
+                  "iam:PassRole"  
+                ],
+                resources: [
+                  props.roleToDowngradeTo.roleArn,
+                  props.roleForUnauthenticatedUser.roleArn
+                ],
+              })],
+            })
+          );
+
+
         const cognitoPool = cognito.UserPool.fromUserPoolId(this, "myCognitoUserPool", 
             props.cognitoUserPoolId);
 
@@ -50,11 +75,21 @@ export class DowngradeGroupRolesStepFunction extends Construct {
             "cognito-idp:UpdateGroup"
             );
 
+        cognitoPool.grant(step2Function,
+          "cognito-identity:SetIdentityPoolRoles",
+          "cognito-identity:ListIdentityPools",
+          "cognito-identity:ListIdentities",
+          "cognito-identity:UpdateIdentityPool",
+          "cognito-identity:GetIdentityPoolRoles",
+          );
+
 
         const stepFunctions = new stepfunctionstasks.LambdaInvoke(this, "Downgrade Role Of Group", {
           lambdaFunction: step1Function, 
           resultPath: '$.step1Result'
         })
+
+        stepFunctions.next(step2Function);
 
         this.stepFuncStateMachine = new stepfunctions.StateMachine(this, 'BudgetWatcherStateMachine', {
           definition: stepFunctions,
