@@ -1,7 +1,7 @@
 # Welcome to your CDK TypeScript project
 
 To deploy, run:
-   cdk deploy --parameters CognitoUserPoolId=<congito pool id> --parameters NameOfCognitoGroupToDowngrade=<cognito group you want downgraded>
+   cdk deploy --parameters CognitoUserPoolId=<congito pool id> --parameters NameOfCognitoGroupToDowngrade=<cognito group you want downgraded> --parameters IdentityPoolId=<identity pool id>
 
 This is a blank project for CDK development with TypeScript.
 

@@ -44,6 +44,7 @@ export const handler = async (event: any, context: Context): Promise<any> => {
     const listIdentitiesCommand: ListIdentitiesCommand = new ListIdentitiesCommand(listIdentitiesInput);
 
     const listIdentitiesResult: ListIdentitiesCommandOutput = await identityClient.send(listIdentitiesCommand);
+    console.log(JSON.stringify(listIdentitiesResult));
 
     const getIdentityPoolRolesInput: GetIdentityPoolRolesCommandInput = {
        IdentityPoolId: identityPoolId
