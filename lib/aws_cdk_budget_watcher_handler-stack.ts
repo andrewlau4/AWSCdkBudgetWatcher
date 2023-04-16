@@ -64,7 +64,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
         }
 
       ]
-    })
+    });
 
 
     //need to install esbuild https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html

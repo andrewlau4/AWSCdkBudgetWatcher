@@ -1,17 +1,42 @@
 # Welcome to your CDK TypeScript project
+This project demostrates setting up below AWS resources and workflow using CDK:
+
+![Workflow](workflow.drawio.png)
+
+To install AWS CDK, follow the instructions here: https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
 
 To deploy, run:
    cdk deploy --parameters CognitoUserPoolId=<congito pool id> --parameters NameOfCognitoGroupToDowngrade=<cognito group you want downgraded> --parameters IdentityPoolId=<identity pool id>
 
-This is a blank project for CDK development with TypeScript.
+The budget can be configured by this line of code in [this file](./lib/aws_cdk_budget_watcher_handler-stack.ts):
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+```
+    const cfnBudget = new budgets.CfnBudget(this, "Buget", {
+      budget: {
+        budgetType: 'COST',
+        timeUnit: 'DAILY',
+        budgetLimit: {
+          amount: 2,
+          unit: 'USD',
+        },
+        budgetName: 'MyBuget',
+      },
+      notificationsWithSubscribers: [
+        {
+          notification: {
+            notificationType: 'ACTUAL',
+            comparisonOperator: 'GREATER_THAN',
+            threshold: 75, 
+            thresholdType: 'PERCENTAGE'
+          },
+          subscribers: [
+            {
+              subscriptionType: 'SNS',
+              address: overbudgetTopic.topicArn
+            },
+            ]
+        }
 
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+      ]
+    });
+```

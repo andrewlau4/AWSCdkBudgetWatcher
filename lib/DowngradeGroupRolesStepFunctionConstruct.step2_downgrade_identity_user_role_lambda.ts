@@ -3,8 +3,9 @@ import { Context } from 'aws-lambda';
 
 import { StepFunctionLambdaStepsEnv } from './Constants';
 
-import { CognitoIdentityClient, ListIdentitiesCommand, ListIdentitiesCommandInput, ListIdentitiesCommandOutput,
-    GetIdentityPoolRolesCommand, GetIdentityPoolRolesCommandInput, GetIdentityPoolRolesCommandOutput, SetIdentityPoolRolesCommand,
+import { CognitoIdentityClient, 
+    GetIdentityPoolRolesCommand, GetIdentityPoolRolesCommandInput, 
+    GetIdentityPoolRolesCommandOutput, SetIdentityPoolRolesCommand,
     SetIdentityPoolRolesCommandInput, SetIdentityPoolRolesCommandOutput
 } from "@aws-sdk/client-cognito-identity";
 
@@ -16,8 +17,8 @@ enum IdentityPoolAuthenticationState {
 
 type DowngradeIdentityRolesResult = {
     [key in IdentityPoolAuthenticationState]?: {
-        originlGroupArn?: string;
-        afterGroupArn?: string;
+        originRoleArn?: string;
+        afterRoleArn?: string;
     }
 }
 
@@ -35,16 +36,6 @@ export const handler = async (event: any, context: Context): Promise<any> => {
     const identityPoolId = process.env[StepFunctionLambdaStepsEnv.IDENTITY_POOL_ID];
 
     const identityClient = new CognitoIdentityClient({ region: process.env.AWS_REGION });
-
-    const listIdentitiesInput: ListIdentitiesCommandInput = {
-        IdentityPoolId: identityPoolId, 
-        MaxResults: 50, 
-        HideDisabled: true,
-    };
-    const listIdentitiesCommand: ListIdentitiesCommand = new ListIdentitiesCommand(listIdentitiesInput);
-
-    const listIdentitiesResult: ListIdentitiesCommandOutput = await identityClient.send(listIdentitiesCommand);
-    console.log(JSON.stringify(listIdentitiesResult));
 
     const getIdentityPoolRolesInput: GetIdentityPoolRolesCommandInput = {
        IdentityPoolId: identityPoolId
@@ -70,15 +61,15 @@ export const handler = async (event: any, context: Context): Promise<any> => {
             
         };
 
-        result[IdentityPoolAuthenticationState.Auth].originlGroupArn = 
+        result[IdentityPoolAuthenticationState.Auth].originRoleArn = 
             getIdentityPoolRolesResult.Roles![IdentityPoolAuthenticationState.Auth];
-        result[IdentityPoolAuthenticationState.Auth].afterGroupArn = 
+        result[IdentityPoolAuthenticationState.Auth].afterRoleArn = 
             process.env[StepFunctionLambdaStepsEnv.ROLE_TO_DOWNGRADE_TO_ARN];    
         
         if (Object.keys(getIdentityPoolRolesResult.Roles ?? {}).includes(IdentityPoolAuthenticationState.UnAuth)) {
-            result[IdentityPoolAuthenticationState.UnAuth].originlGroupArn = 
+            result[IdentityPoolAuthenticationState.UnAuth].originRoleArn = 
                 getIdentityPoolRolesResult.Roles![IdentityPoolAuthenticationState.UnAuth] ?? "";
-            result[IdentityPoolAuthenticationState.UnAuth].afterGroupArn = 
+            result[IdentityPoolAuthenticationState.UnAuth].afterRoleArn = 
                 process.env[StepFunctionLambdaStepsEnv.ROLE_FOR_UNAUTH_ARN];
 
             setidentitypoolrolescommandinput.Roles![IdentityPoolAuthenticationState.UnAuth] =
