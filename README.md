@@ -1,7 +1,7 @@
 # Welcome to your CDK TypeScript project
 This project demostrates setting up below AWS resources and workflow using CDK:
 
-![Workflow](workflow.drawio.png)
+![Workflow](./readme/workflow.drawio.png)
 
 To install AWS CDK, follow the instructions here: https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
 
