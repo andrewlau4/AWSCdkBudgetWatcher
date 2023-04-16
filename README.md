@@ -1,5 +1,5 @@
 # AWS CDK TypeScript Demo for Over-Budget Workflow
-This project demostrates setting up below AWS resources and workflow using CDK:
+This project demostrates using CDK to programmatically set up below AWS resources and workflow:
 
 ![Workflow](./readme/workflow.drawio.png)
 
@@ -10,6 +10,8 @@ This project demostrates setting up below AWS resources and workflow using CDK:
 * AWS Lambda function
 * AWS Step functions
 * all the required permissions and IAM Roles
+
+This project also demonstrates how to programmatically change IAM Roles/permissions on Cognito Users upon lambda triggers.
 
 ## Setup 
 To install AWS CDK, follow the instructions here: https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
