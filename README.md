@@ -18,7 +18,9 @@ To install AWS CDK, follow the instructions here: https://docs.aws.amazon.com/cd
 
 ## How To Deploy
 To deploy, run:
+```
    cdk deploy --parameters CognitoUserPoolId=<congito pool id> --parameters NameOfCognitoGroupToDowngrade=<cognito group you want downgraded> --parameters IdentityPoolId=<identity pool id>
+```
 
 ## Budget Configuration
 The budget can be configured by this line of code in [this file](./lib/aws_cdk_budget_watcher_handler-stack.ts):
