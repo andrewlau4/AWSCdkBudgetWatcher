@@ -11,7 +11,7 @@ This project demostrates using CDK to programmatically set up below AWS resource
 * AWS Step functions
 * all the required permissions and IAM Roles
 
-This project also demonstrates how to programmatically change IAM Roles/permissions given to Cognito Users upon lambda triggers.
+This project also demonstrates how to programmatically (upon lambda triggers), change IAM Roles/permissions given to Cognito Users.
 
 ## Setup 
 To install AWS CDK, follow the instructions here: https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
