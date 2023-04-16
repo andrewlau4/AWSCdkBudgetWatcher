@@ -88,7 +88,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       },
       "sts:AssumeRoleWithWebIdentity") 
     });
-    //this is the permission i want to downgrade the cognito users to if i am over budget
+    //this is the permission i want to downgrade the cognito users to, (if i am over-budget)
     // set the Policy to something that you see fit
     downgradeToRole.addToPolicy(
       new iam.PolicyStatement({
@@ -109,7 +109,7 @@ export class AwsCdkBudgetWatcherHandlerStack extends cdk.Stack {
       },
       "sts:AssumeRoleWithWebIdentity") 
     });
-    //this is the permission i want to downgrade the cognito users to if i am over budget
+    //this is the permission i want to downgrade the cognito users to (if i am over-budget)
     // set the Policy to something that you see fit
     // unauthRole.addToPolicy(
     //   new iam.PolicyStatement({
